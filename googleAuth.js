@@ -5,7 +5,13 @@ const bcrypt = require('bcrypt');
 const User = require('./models/User');
 
 module.exports = (app, jwt) => {
-  app.use(passport.initialize());
+ app.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'development' || req.hostname.includes('ngrok')) {
+    req.headers.host = new URL(process.env.GOOGLE_CALLBACK_URL).host;
+    req.headers['x-forwarded-proto'] = 'https';
+  }
+  next();
+});
 
   passport.use(
     new GoogleStrategy(
