@@ -69,6 +69,27 @@ app.get('/me', async (req, res) => {
   }
 });
 
-// 6️⃣ Chạy server
+// 6️⃣ Route ping for auto-detect
+app.get('/ping', (req, res) => res.send('OK'));
+
+// 7️⃣ Chạy server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+const os = require('os');
+
+function getLocalIP() {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return 'localhost';
+}
+
+const ip = getLocalIP();
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://${ip}:${PORT}`);
+});
